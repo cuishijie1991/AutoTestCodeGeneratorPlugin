@@ -10,6 +10,7 @@ import java.util.*;
  * Created by shijiecui on 2017/11/2.
  */
 public class JSONModelTestGenerator implements MethodTestGenerator {
+    public final static String Identifier = "IParseFromJSONObject";
     private PsiClass clz;
     private PsiMethod method;
     private HashMap<String, PsiField> allFields = new HashMap<>();

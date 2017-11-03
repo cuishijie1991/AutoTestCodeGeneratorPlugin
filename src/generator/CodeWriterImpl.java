@@ -28,7 +28,11 @@ public class CodeWriterImpl implements CodeWriter {
     public void generateTestCode() {
         insert = CodeInsert.getInstance(target);
         testGenerator = MethodTestGeneratorFactory.getMethodGenerator(clz);
-        _createModelTest(testGenerator, insert);
+        if (testGenerator != null) {
+            _createModelTest(testGenerator, insert);
+        } else {
+            throw new IllegalAccessError("Sorry, this class is not supported yet!");
+        }
     }
 
     private void _createModelTest(MethodTestGenerator testGenerator, CodeInsert insert) {

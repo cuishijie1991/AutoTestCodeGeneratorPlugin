@@ -7,12 +7,17 @@ import com.intellij.psi.PsiClass;
  */
 public class MethodTestGeneratorFactory {
     public static MethodTestGenerator getMethodGenerator(PsiClass clz) {
-        MethodTestGenerator generator;
-        if (clz.getName().toLowerCase().contains("protocol")) {
+        MethodTestGenerator generator = null;
+        if (clz.getSuperClass().getName().equals(JSONProtocolTestGenerator.Identifier)) {
             generator = new JSONProtocolTestGenerator();
         } else {
-            generator = new JSONModelTestGenerator();
+            for (PsiClass interfaces : clz.getInterfaces()) {
+                if (interfaces.getName().equals(JSONModelTestGenerator.Identifier)) {
+                    generator = new JSONModelTestGenerator();
+                    break;
+                }
+            }
         }
-        return generator.setClass(clz);
+        return generator == null ? null : generator.setClass(clz);
     }
 }
