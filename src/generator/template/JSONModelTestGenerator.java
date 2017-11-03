@@ -2,6 +2,7 @@ package generator.template;
 
 import com.intellij.psi.*;
 import org.apache.http.util.TextUtils;
+import tools.GenerateTextUtils;
 import tools.RandomValue;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
     private PsiMethod method;
     private HashMap<String, PsiField> allFields = new HashMap<>();
     private StringBuilder sb = new StringBuilder();
-    private String instance;
+    public String instance;
 
     @Override
     public MethodTestGenerator setClass(PsiClass clz) {
@@ -45,9 +46,7 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         if (method == null) {
             return "";
         }
-        sb.setLength(0);
-        sb.append(String.format("%s %s;\n", clz.getName(), instance));
-        return sb.toString();
+        return GenerateTextUtils.getFieldDeclarationText(clz.getName(), instance);
     }
 
     @Override
@@ -55,27 +54,7 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         if (method == null) {
             return "";
         }
-        sb.setLength(0);
-        String paramStr = "";
-        PsiMethod[] constructors = clz.getConstructors();
-        if (constructors.length > 0) {
-            PsiMethod constructor = constructors[0];
-            PsiParameterList parameterList = constructor.getParameterList();
-
-            for (PsiParameter p : parameterList.getParameters()) {
-                paramStr += RandomValue.getRandomValueByType(p.getType()) + ", ";
-            }
-            if (paramStr.length() > 0) {
-                paramStr = paramStr.substring(0, paramStr.length() - 2);
-            }
-        }
-
-
-        sb.append("@org.junit.Before\n")
-                .append("public void setUp(){\n")
-                .append(String.format("%s = new %s(%s);\n", instance, clz.getName(), paramStr))
-                .append("}\n");
-        return sb.toString();
+        return GenerateTextUtils.getBeforeMethod(GenerateTextUtils.getInstanceDeclarationText(clz, instance));
     }
 
     @Override
@@ -84,11 +63,8 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         if (method == null) {
             return testMethods;
         }
-        String instance = "m" + clz.getName();
         HashMap<String, String> validExpressions = new LinkedHashMap<>();
         sb.setLength(0);
-        sb.append("@org.junit.Test\n")
-                .append("public void parseFromJSONObject() throws Exception {\n");
         //TODO 解析方法中的变量和赋值
         String body = method.getBody().getText();
         String[] splits = body.split("\n");
@@ -105,8 +81,15 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
             }
             String var = keys[0].trim();
             String expression = keys[1];
+            if (TextUtils.isEmpty(var)) {
+                continue;
+            }
+            //先查找JsonArray
+            if (var.contains("JSONArray")) {
+                //TODO
+            }
             //参数必须是一个变量，否则抛弃
-            if (TextUtils.isEmpty(var) || var.contains(" ")) {
+            if (var.contains(" ")) {
                 continue;
             }
             if (allFields.containsKey(var)) {
@@ -120,7 +103,6 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
             return testMethods;
         }
         String temVar = null;
-        String jsonObjName = null;
 
         //TODO 生成测试变量
         for (String var : validExpressions.keySet()) {
@@ -138,26 +120,24 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         if (index == -1) {
             return testMethods;
         }
-        jsonObjName = firstExpression.substring(0, index);
-        sb.append(String.format("org.json.JSONObject %s = new org.json.JSONObject();\n", jsonObjName));
+        sb.append("org.json.JSONObject jo = new org.json.JSONObject();\n");
         for (String expression : validExpressions.values()) {
-            int start = expression.indexOf("opt");
+            int start = 0;
             int end = expression.indexOf("(");
-            if (start > -1 && end > start) {
+            if (end > start) {
                 String tem = expression.substring(start, end);
-                sb.append(expression.replace(tem, "put"));
+                sb.append(expression.replace(tem, " jo.put"));
             }
         }
 
         //TODO 生成parse语句
-        sb.append(instance + ".parseFromJSONObject(" + jsonObjName + ");\n");
+        sb.append(instance + ".parseFromJSONObject(jo);\n");
 
         //TODO 生成Assert语句
         for (String var : validExpressions.keySet()) {
-            sb.append(String.format("org.junit.Assert.assertEquals(%s, %s.%s);\n", var, instance, var));
+            sb.append(GenerateTextUtils.getAssertExpression(var, instance + "." + var));
         }
-        sb.append("}\n");
-        testMethods.add(sb.toString());
+        testMethods.add(GenerateTextUtils.getTestMethod("parseFromJSONObject", sb.toString()));
         return testMethods;
     }
 
