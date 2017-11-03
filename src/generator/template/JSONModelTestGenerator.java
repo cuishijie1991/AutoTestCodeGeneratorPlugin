@@ -1,4 +1,4 @@
-package generator;
+package generator.template;
 
 import com.intellij.psi.*;
 import org.apache.http.util.TextUtils;

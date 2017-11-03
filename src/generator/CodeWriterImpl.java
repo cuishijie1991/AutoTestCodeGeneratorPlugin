@@ -1,6 +1,8 @@
 package generator;
 
 import com.intellij.psi.*;
+import generator.template.MethodTestGeneratorFactory;
+import generator.template.MethodTestGenerator;
 import tools.CodeInsert;
 
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 /**
  * Created by shijiecui on 2017/11/1.
  */
-public class JunitCodeWriterImpl implements CodeWriter {
+public class CodeWriterImpl implements CodeWriter {
     private PsiClass clz;
     private PsiFile target;
     private CodeInsert insert;
@@ -25,7 +27,7 @@ public class JunitCodeWriterImpl implements CodeWriter {
     @Override
     public void generateTestCode() {
         insert = CodeInsert.getInstance(target);
-        testGenerator = new JSONModelTestGenerator().setClass(clz);
+        testGenerator = MethodTestGeneratorFactory.getMethodGenerator(clz);
         _createModelTest(testGenerator, insert);
     }
 
@@ -38,4 +40,5 @@ public class JunitCodeWriterImpl implements CodeWriter {
         }
         insert.checkSetClassModifier(PsiModifier.PUBLIC);
     }
+
 }

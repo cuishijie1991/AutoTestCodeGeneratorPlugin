@@ -11,7 +11,7 @@ public class CodeGeneratorImpl implements CodeGenerator {
     private CodeWriter writer;
 
     public CodeGeneratorImpl() {
-        writer = new JunitCodeWriterImpl();
+        writer = new CodeWriterImpl();
     }
 
     @Override
