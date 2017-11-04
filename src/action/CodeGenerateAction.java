@@ -63,7 +63,7 @@ public class CodeGenerateAction extends AnAction {
             editor = e.getData(PlatformDataKeys.EDITOR);
             project = e.getData(PlatformDataKeys.PROJECT);
             psiFile = e.getData(PlatformDataKeys.PSI_FILE);
-            if (!psiFile.getName().endsWith(".java")) {
+            if (psiFile == null || !psiFile.getName().endsWith(".java")) {
                 e.getPresentation().setEnabled(false);
             } else {
                 e.getPresentation().setEnabled(true);
