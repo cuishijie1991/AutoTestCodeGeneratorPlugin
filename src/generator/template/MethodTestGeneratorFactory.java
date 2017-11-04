@@ -8,11 +8,11 @@ import com.intellij.psi.PsiClass;
 public class MethodTestGeneratorFactory {
     public static MethodTestGenerator getMethodGenerator(PsiClass clz) {
         MethodTestGenerator generator = null;
-        if (clz.getSuperClass().getName().equals(JSONProtocolTestGenerator.Identifier)) {
-            generator = new JSONProtocolTestGenerator();
+        if (clz.getSuperClass().getName().equals("BaseProtocol")) {
+            generator = new JSONProtocolWithModelTestGenerator();
         } else {
             for (PsiClass interfaces : clz.getInterfaces()) {
-                if (interfaces.getName().equals(JSONModelTestGenerator.Identifier)) {
+                if (interfaces.getName().equals("IParseFromJSONObject")) {
                     generator = new JSONModelTestGenerator();
                     break;
                 }

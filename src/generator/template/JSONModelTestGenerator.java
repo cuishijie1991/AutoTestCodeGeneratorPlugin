@@ -11,11 +11,10 @@ import java.util.*;
  * Created by shijiecui on 2017/11/2.
  */
 public class JSONModelTestGenerator implements MethodTestGenerator {
-    public final static String Identifier = "IParseFromJSONObject";
     private PsiClass clz;
     private PsiMethod method;
     private HashMap<String, PsiField> allFields = new HashMap<>();
-    private StringBuilder sb = new StringBuilder();
+    protected StringBuilder sb = new StringBuilder();
     public String instance;
 
     @Override
@@ -68,6 +67,7 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         //TODO 解析方法中的变量和赋值
         String body = method.getBody().getText();
         String[] splits = body.split("\n");
+        //筛选语句类型 evaluator_id = result.optInt("evaluator_id", evaluator_id);
         for (String s : splits) {
             //只获取包含 '=' 的语句
             if (TextUtils.isEmpty(s) || !s.contains("=")) {
@@ -81,16 +81,17 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
             }
             String var = keys[0].trim();
             String expression = keys[1];
-            if (TextUtils.isEmpty(var)) {
+            //参数必须是一个变量，否则抛弃
+            if (TextUtils.isEmpty(var) || var.contains(" ")) {
+                continue;
+            }
+            //'='右边表达式必须含有'.'否则可能不是result.optInt("evaluator_id", evaluator_id)型赋值语句，需要抛弃
+            if (TextUtils.isEmpty(expression) || !expression.contains(".")) {
                 continue;
             }
             //先查找JsonArray
             if (var.contains("JSONArray")) {
                 //TODO
-            }
-            //参数必须是一个变量，否则抛弃
-            if (var.contains(" ")) {
-                continue;
             }
             if (allFields.containsKey(var)) {
                 if (!expression.contains(",")) {
@@ -102,24 +103,14 @@ public class JSONModelTestGenerator implements MethodTestGenerator {
         if (validExpressions.size() == 0) {
             return testMethods;
         }
-        String temVar = null;
-
         //TODO 生成测试变量
         for (String var : validExpressions.keySet()) {
-            if (temVar == null) {
-                temVar = var;
-            }
             PsiField field = allFields.get(var);
             String s = String.format("%s %s = %s;\n", field.getType().getCanonicalText(), var, RandomValue.getRandomValueByType(field.getType()));
             sb.append(s);
         }
 
         //TODO 生成测试赋值语句
-        String firstExpression = validExpressions.get(temVar);
-        int index = firstExpression.indexOf(".");
-        if (index == -1) {
-            return testMethods;
-        }
         sb.append("org.json.JSONObject jo = new org.json.JSONObject();\n");
         for (String expression : validExpressions.values()) {
             int start = 0;
