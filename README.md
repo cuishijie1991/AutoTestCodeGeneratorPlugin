@@ -21,7 +21,7 @@
   - 支持对protocol类型解析，支持包含Array和子model的protocol
 
 ## 使用方法
- 1. 在工程/resources/plugins中，找到最新的插件jar包，AutoTestCodeGeneratorPlugin_xxx.jar下载到本地
+ 1. 在工程/plugins中，找到最新的插件jar包，AutoTestCodeGeneratorPlugin_xxx.jar下载到本地
  2. 打开AndroidStudio-Preferences-plugins-Install plugin from disk...
     选中AutoTestCodeGeneratorPlugin_xxx.jar-Ok-重启AndroidStudio
  3. 插件安装成功后，有两种方法生成测试文件
