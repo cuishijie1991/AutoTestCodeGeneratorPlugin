@@ -1,0 +1,9 @@
+/*
+!.gitignore
+!/src
+!/resources
+!README.md
+!/images
+!/plugins
+.idea/
+out/

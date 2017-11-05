@@ -26,5 +26,6 @@
     选中AutoTestCodeGeneratorPlugin_xxx.jar-Ok-重启AndroidStudio
  3. 插件安装成功后，有两种方法生成测试文件
     - 工程目录中，选中 XX.java 文件，右键菜单中，选中"generateTestCode",即可生成test对应目录下生成 XXTest.java
-
+     ![image](https://raw.githubusercontent.com/cuishijie1991/AutoTestCodeGeneratorPlugin/master/images/createTest.png)
     - 打开 XX.java 文件，选则导航栏的Code菜单，选中"generateTestCode",即可生成test对应目录下生成 XXTest.java
+     ![image](https://raw.githubusercontent.com/cuishijie1991/AutoTestCodeGeneratorPlugin/master/images/createTest2.png)
