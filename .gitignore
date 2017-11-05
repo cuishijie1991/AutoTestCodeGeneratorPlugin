@@ -3,5 +3,7 @@
 !/src
 !/resources
 !README.md
+!/plugins
+!/images
 .idea/
 out/
