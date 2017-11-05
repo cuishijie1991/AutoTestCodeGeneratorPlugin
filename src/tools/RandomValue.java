@@ -66,8 +66,10 @@ public class RandomValue {
                 return getRandomFloat() + "F";
             case "double":
                 return getRandomDouble() + "D";
-            case "java.util.List<java.lang.String>":
             default:
+                if (_type.contains("List")) {
+                    return "new java.util.ArrayList<>();";
+                }
                 return "null";
         }
     }

@@ -3,3 +3,5 @@
 !/src
 !/resources
 !README.md
+.idea/
+out/
