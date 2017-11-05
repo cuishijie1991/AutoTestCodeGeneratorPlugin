@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Created by shijiecui on 2017/11/4.
  */
-public class JSONProtocolWithModelTestGenerator extends JSONModelTestGenerator {
+public class JSONProtocolModelTestGenerator extends JSONModelTestGenerator {
     private HashMap<String, PsiClass> modelFields = new LinkedHashMap<>();
 
     @Override
@@ -33,7 +33,7 @@ public class JSONProtocolWithModelTestGenerator extends JSONModelTestGenerator {
     public List<String> generateTestMethod() {
         List<String> testMethods = super.generateTestMethod();
         if (testMethods.size() == 0) {
-            testMethods.add(GenerateTextUtils.getTestMethod("parseFromJSONObject", instance + ".parseFromJSONObject(new org.json.JSONObject());\n"));
+            testMethods.add(GenerateTextUtils.getTestMethod("parseFromJSONObject", instance + ".parseFromJSONObject(jo);\n"));
         }
         for (int i = 0; i < testMethods.size(); i++) {
             String methodText = testMethods.get(i);
@@ -122,26 +122,30 @@ public class JSONProtocolWithModelTestGenerator extends JSONModelTestGenerator {
         }
 
         //TODO 生成测试变量并赋值
-        //FClz fVar = new FClz();
-        String s = String.format("%s.%s %s", ((PsiJavaFile)clz.getContainingFile()).getPackageName(), clz.getName(), GenerateTextUtils.getInstanceDeclarationText(clz, fVar));
-        sb.append(s);
         // 为fVar的变量赋值
+        String s;
         for (String var : validExpressions.keySet()) {
             PsiField field = allFields.get(var);
-            s = String.format("%s.%s = %s;\n", fVar, var, RandomValue.getRandomValueByType(field.getType()));
+            s = String.format("%s %s = %s;\n", field.getType().getCanonicalText(), var, RandomValue.getRandomValueByType(field.getType()));
             sb.append(s);
         }
-        //instance.fVar = fVar;
-        s = String.format("%s.%s = %s;\n", instance, fVar, fVar);
-        sb.append(s);
+        //TODO 构建jsonObj
+        sb.append("org.json.JSONObject jo = new org.json.JSONObject();\n");
+        for (String expression : validExpressions.values()) {
+            int start = 0;
+            int end = expression.indexOf("(");
+            if (end > start) {
+                String tem = expression.substring(start, end);
+                sb.append(expression.replace(tem, " jo.put"));
+            }
+        }
         assignAndAssert[0] = sb.toString();
 
         //TODO 生成Assert语句
         sb.setLength(0);
-        String left = fVar + ".";
         String right = String.format("%s.%s.", instance, fVar);
         for (String var : validExpressions.keySet()) {
-            sb.append(GenerateTextUtils.getAssertExpression(left + var, right + var));
+            sb.append(GenerateTextUtils.getAssertExpression(var, right + var));
         }
         assignAndAssert[1] = sb.toString();
         return assignAndAssert;

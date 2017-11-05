@@ -33,6 +33,7 @@
     <action id="CodeGeneratorId" class="action.CodeGenerateAction" text="generateTestCode"
             description="generate stupid test code lol..">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+      <add-to-group group-id="CodeMenu" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="meta T"/>
     </action>
   </actions>

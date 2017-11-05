@@ -11,11 +11,11 @@ import java.util.*;
  * Created by shijiecui on 2017/11/2.
  */
 public class JSONModelTestGenerator implements MethodTestGenerator {
-    private PsiClass clz;
-    private PsiMethod method;
-    private HashMap<String, PsiField> allFields = new HashMap<>();
+    protected PsiClass clz;
+    protected PsiMethod method;
+    protected HashMap<String, PsiField> allFields = new HashMap<>();
     protected StringBuilder sb = new StringBuilder();
-    public String instance;
+    protected String instance;
 
     @Override
     public MethodTestGenerator setClass(PsiClass clz) {
