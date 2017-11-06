@@ -59,6 +59,17 @@ public class JSONProtocolModelTestGenerator extends JSONModelTestGenerator {
     //参照JSONModelTestGenerator算法解析成员变量的类并对其进行赋值和assert构建返回两部分的代码
     private String[] _parseFieldAssignAndAssert(String fVar, PsiClass clz) {
         String[] assignAndAssert = new String[2];
+        //判断子类型是否可以解析
+        boolean isAnalysable = false;
+        for (PsiClass interfaces : clz.getInterfaces()) {
+            if (interfaces.getName().equals("IParseFromJSONObject")) {
+                isAnalysable = true;
+                break;
+            }
+        }
+        if (!isAnalysable) {
+            return assignAndAssert;
+        }
         //解析变量
         StringBuilder sb = new StringBuilder();
         PsiMethod method = null;
