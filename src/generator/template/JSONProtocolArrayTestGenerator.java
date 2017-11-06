@@ -151,39 +151,37 @@ public class JSONProtocolArrayTestGenerator implements MethodTestGenerator {
             }
             validExpressions.put(var, expression);
         }
-        if (validExpressions.size() == 0) {
-            return null;
-        }
-        String temVar = null;
         String jsonObjName = null;
-
-        //TODO 生成测试变量
-        for (String var : validExpressions.keySet()) {
-            if (temVar == null) {
-                temVar = var;
+        if (validExpressions.size() > 0) {
+            String temVar = null;
+            //TODO 生成测试变量
+            for (String var : validExpressions.keySet()) {
+                if (temVar == null) {
+                    temVar = var;
+                }
+                PsiField field = allFields.get(var);
+                if (field != null) {
+                    String s = String.format("%s %s = %s;\n", field.getType().getCanonicalText(), var, RandomValue.getRandomValueByType(field.getType()));
+                    sb.append(s);
+                }
             }
-            PsiField field = allFields.get(var);
-            if (field != null) {
-                String s = String.format("%s %s = %s;\n", field.getType().getCanonicalText(), var, RandomValue.getRandomValueByType(field.getType()));
-                sb.append(s);
-            }
-        }
 
-        //TODO 生成测试赋值语句
-        String firstExpression = validExpressions.get(temVar);
-        int index = firstExpression.indexOf(".");
-        if (index == -1) {
-            return null;
-        }
-        jsonObjName = firstExpression.substring(0, index);
-        sb.append(String.format("org.json.JSONObject %s = new org.json.JSONObject();\n", jsonObjName));
-        for (String key : validExpressions.keySet()) {
-            String expression = validExpressions.get(key);
-            int start = expression.indexOf("opt");
-            int end = expression.indexOf("(");
-            if (start > -1 && end > start) {
-                String tem = expression.substring(start, end);
-                sb.append(expression.replace(tem, "put"));
+            //TODO 生成测试赋值语句
+            String firstExpression = validExpressions.get(temVar);
+            int index = firstExpression.indexOf(".");
+            if (index == -1) {
+                return null;
+            }
+            jsonObjName = firstExpression.substring(0, index);
+            sb.append(String.format("org.json.JSONObject %s = new org.json.JSONObject();\n", jsonObjName));
+            for (String key : validExpressions.keySet()) {
+                String expression = validExpressions.get(key);
+                int start = expression.indexOf("opt");
+                int end = expression.indexOf("(");
+                if (start > -1 && end > start) {
+                    String tem = expression.substring(start, end);
+                    sb.append(expression.replace(tem, "put"));
+                }
             }
         }
         if (isHasList) {
@@ -200,12 +198,21 @@ public class JSONProtocolArrayTestGenerator implements MethodTestGenerator {
                 }
             }
         }
+        if (jsonObjName == null && validListExpressions.size() > 0) {
+            String firstExpression = validListExpressions.get(0);
+            int index = firstExpression.indexOf(".");
+            if (index == -1) {
+                return null;
+            }
+        }
         //TODO 生成parse语句
         sb.append(instance + ".parseFromJSONObject(" + jsonObjName + ");\n");
 
         //TODO 生成Assert语句
-        for (String var : validExpressions.keySet()) {
-            sb.append(String.format("org.junit.Assert.assertEquals(%s, %s.%s);\n", var, instance, var));
+        if (validExpressions.size() > 0) {
+            for (String var : validExpressions.keySet()) {
+                sb.append(String.format("org.junit.Assert.assertEquals(%s, %s.%s);\n", var, instance, var));
+            }
         }
         if (isHasList) {
             for (String var : listFields.keySet()) {

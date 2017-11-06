@@ -82,6 +82,12 @@ public class JSONProtocolModelTestGenerator extends JSONModelTestGenerator {
         //解析parseFromJSONObject方法，筛选有效变量
         HashMap<String, String> validExpressions = new LinkedHashMap<>();
         sb.setLength(0);
+        if (method == null) {
+            throw new IllegalArgumentException("111111");
+        }
+        if (method.getBody() == null) {
+            throw new IllegalArgumentException("222222");
+        }
         //TODO 解析方法中的变量和赋值
         String body = method.getBody().getText();
         String[] splits = body.split("\n");
