@@ -23,6 +23,9 @@
 - **171106_v3.1**
   - 修复bug，提高插件稳定性
 
+  - **171106_v3.2**
+    - 新增功能容错功能，当目标类不匹配时，自动生成一个测试模板类
+
 ## 使用方法
  1. 在工程/plugins中，找到最新的插件jar包，AutoTestCodeGeneratorPlugin_xxx.jar下载到本地
  2. 打开AndroidStudio-Preferences-plugins-Install plugin from disk...

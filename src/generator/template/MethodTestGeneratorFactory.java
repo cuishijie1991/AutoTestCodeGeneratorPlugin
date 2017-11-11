@@ -38,6 +38,9 @@ public class MethodTestGeneratorFactory {
                 }
             }
         }
-        return generator == null ? null : generator.setClass(clz);
+        if (generator == null) {
+            generator = new SimpleTemplateTestGenerator();
+        }
+        return generator.setClass(clz);
     }
 }
